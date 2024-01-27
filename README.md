@@ -46,19 +46,6 @@ To get started with Transformer Plain, follow these steps:
 
 ## Usage
 
-1. Dataset: Make sure you have a dataset suitable for self-supervised prediction from Huggingface (or use the AG-NEWS one). Simply pass the `dataset_name` for training on your dataset of choice.
-
-2. Configure the training parameters: Adjust the hyperparameters by passing your own arguments.
-
-3. Train the model: Run the training script to start the self-supervised prediction training loop.
-
-4. Evaluate the model: Use the trained model to make predictions on your test dataset and evaluate its performance.
-
-## Example run
-```
-python main.py  --num_layers 2 --n_heads 8 --num_kv_heads --seq_len 128 --num_hidden 128 --num_epochs 10 --batch_size 32 --lr 0.001 --device cpu --dataset_name ag_news
-```
-
 ## License
 
 This project is licensed under the MIT License. 

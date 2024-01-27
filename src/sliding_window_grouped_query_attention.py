@@ -33,16 +33,17 @@ class KVCacheMemory():
         
 
 class GroupedQueryAttention(nn.Module):
-    def __init__(self, num_hidden, num_heads, num_kv_heads, seq_len, d_k, dropout=0.1) -> None:
+    def __init__(self, num_hidden, num_heads, num_kv_heads, seq_len, window_size, d_k, dropout=0.1) -> None:
         super().__init__()
         self.num_hidden = num_hidden
         self.num_heads = num_heads
         self.num_kv_heads = num_kv_heads
         self.num_rep = self.num_heads // self.num_kv_heads
 
+
         self.rotary_encodings = RotaryEncodings(seq_len, num_hidden)
 
-
+        self.window_size = window_size
         self.seq_len = seq_len
         self.d_k = d_k
         
@@ -55,12 +56,18 @@ class GroupedQueryAttention(nn.Module):
         self.W_o = nn.Linear(num_heads * num_hidden, num_hidden)
         self.softmax = nn.Softmax(dim=-1)
         self.dropout = nn.Dropout(dropout)
-        self.mask = self.get_mask(self.seq_len)
+        self.mask = self.get_sliding_window_mask(self.seq_len, self.window_size)
     
-    def get_mask(self, size):
+    # def get_mask(self, size):
+    #     device = next(self.parameters()).device
+    #     mask = torch.triu(torch.ones(size, size, device=device), diagonal=1)  
+    #     return mask.unsqueeze(0).unsqueeze(0)  
+
+    def get_sliding_window_mask(self, size, window_size):
         device = next(self.parameters()).device
-        mask = torch.triu(torch.ones(size, size, device=device), diagonal=1)  
-        return mask.unsqueeze(0).unsqueeze(0)  
+        mask =  torch.triu(torch.ones(size, size), diagonal=-window_size) \
+            * torch.tril(torch.ones(size, size), diagonal=window_size)  
+        return mask.to(device)
 
     def forward(self, query, keys, values, mask=False):
         # Reshaping expanded to n_heads or n_kv_heads
