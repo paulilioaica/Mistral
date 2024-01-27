@@ -45,7 +45,29 @@ To get started with Transformer Plain, follow these steps:
     ```
 
 ## Usage
+```python
+from mistral import Mistral
 
+decoder_layers_num = 2
+num_hidden = 16
+num_heads = 4
+num_kv_heads = 2
+seq_len = 256
+vocab_size = 100
+window_size = 3
+
+mistral = Mistral(decoder_layers_num, num_hidden, num_heads, num_kv_heads, seq_len, vocab_size, window_size)
+
+# batch_size, seq_len, 1 (vocab_index)
+x = torch.randint(0, vocab_size, (1, seq_len))
+
+output = mistral(x)
+print(output.shape)
+
+```
+```terminal
+torch.Size([1, 256, 100])
+```
 ## License
 
 This project is licensed under the MIT License. 
