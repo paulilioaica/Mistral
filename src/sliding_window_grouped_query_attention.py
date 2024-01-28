@@ -58,15 +58,11 @@ class GroupedQueryAttention(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self.mask = self.get_sliding_window_mask(self.seq_len, self.window_size)
     
-    # def get_mask(self, size):
-    #     device = next(self.parameters()).device
-    #     mask = torch.triu(torch.ones(size, size, device=device), diagonal=1)  
-    #     return mask.unsqueeze(0).unsqueeze(0)  
 
     def get_sliding_window_mask(self, size, window_size):
         device = next(self.parameters()).device
-        mask =  torch.tril(torch.ones(size, size), diagonal=-1) *\
-              torch.triu(torch.ones(size, size), diagonal=-window_size) 
+        mask =  torch.tril(torch.ones(size, size), diagonal=0) *\
+              torch.triu(torch.ones(size, size), diagonal=-window_size-1) 
         return mask.to(device)
 
     def forward(self, query, keys, values, mask=False):
